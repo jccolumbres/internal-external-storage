@@ -2,18 +2,17 @@ package testapp.ayannah.jccolumbres.internalstorage;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -34,14 +33,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onCreateButtonClick(View view) {
-        getPermissions();
+        if (!permissionGranted){
+            checkPermissions();
+            return;
+        }
 
         String content = getString(R.string.lorem_ipsum);
         FileOutputStream fileOutputStream = null;
-        File file = new File(FILE_NAME);
+        File file = getFile(); //new File(FILE_NAME); -- use for internal
 
         try {
-            fileOutputStream = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            fileOutputStream = new FileOutputStream(file); //openFileOutput(FILE_NAME, MODE_PRIVATE); -- use for internal
             fileOutputStream.write(content.getBytes());
             Toast.makeText(this, "File created: " + FILE_NAME, Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
@@ -62,19 +64,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void onReadButtonClick(View view) {
         getPermissions();
-
     }
 
     public void onDeleteButtonClick(View view) {
         getPermissions();
 
-        File file = new File(getFilesDir(), FILE_NAME);
+        File file = getFile();//new File(getFilesDir(), FILE_NAME); -- use for internal
         if (file.exists()){
-            deleteFile(FILE_NAME);
+            //deleteFile(FILE_NAME); -- use for internal
+            file.delete();
             Toast.makeText(this, "File deleted", Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(this, "File not existing", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private File getFile(){
+        return new File(Environment.getExternalStorageDirectory(), FILE_NAME);
     }
 
     /* Checks if external storage is available for read and write */
@@ -131,9 +137,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getPermissions(){
-        if (!permissionGranted){
-            checkPermissions();
-            return;
-        }
+
     }
 }
