@@ -53,5 +53,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onDeleteButtonClick(View view) {
+        File file = new File(getFilesDir(), FILE_NAME);
+        if (file.exists()){
+            deleteFile(FILE_NAME);
+            Toast.makeText(this, "File deleted", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "File not existing", Toast.LENGTH_SHORT).show();
+        }
     }
 }
